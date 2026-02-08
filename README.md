@@ -2,36 +2,78 @@
 
 > **Objetivo**: Workflow multi-agent
 
+Pipeline ideal de qualidade:
+Lint
+Análise estática (SonarCloud)
+Testes automatizados
+Coverage
+Code Review
+Quality Gate
+Merge
+
+
 ---
 
 ## 🛠️ Setup Inicial
 
+## 🛠️ Setup Inicial
+
 ```bash
-# 1. Baixe a pasta .prompts na raiz do projeto contendo os prompts (skills)
-# 2. Crie no github um novo projeto. crie um novo repositório.
+# 1. Baixe a pasta .prompts e Readme na raiz do projeto contendo os prompts (skills)
+# 2. Na raiz do projeto crie um index.js e dentro dele insira:
+console.log('Hello, World!');
+# 3. Crie no github um novo projeto. crie um novo repositório.
+Repositories > New > nome do projeto > create Repository
+git init > git add . > git commit -m "first commit" > 
+git branch -M main > git remote add origin https:... > 
+git push -u origin main
 ```
 
 ### SonarCloud - config
 Adicionar o sonarcloud no github https://sonarcloud.io/login (logar com o github) configurar o SonarCloud via GitHub Actions
-Botão + > analyzer new project > Select all on this page (nome do projeto) > Set up > Number of days - 30> create project
-Choose your Analysis Method (Adminstration) > With GitHub Actions > Name = SONAR_TOKEN e Value =
-Create a GitHub Secret > clicar em  Settings > Secrets and variables > Actions  para se renviado para o github
+Passo 1: analisar novo projeto
+1-Botão + > analyzer new project > Select all on this page (nome do projeto) > Set up > Previous version (análise automatica)> create project
+Passo 2: Automação com GitHub Actions
+1-Adminstration > Choose your Analysis Method  > desabilitar: Automatic Analysis > escolha: With GitHub Actions > veja:  Name = SONAR_TOKEN e Value =
+Passo 3: configurar o github
+1- Em Create a GitHub Secret > clicar em  **go to Settings > Secrets and variables > Actions** 
 Dentro do github:
-1-Actions secrets and variables > new repository secret > Name = SONAR_TOKEN e Value = > add secret
-Vontando para o sonar:
-2-Escolher o tipo do projeto> Js/ts > crie.github/workflows/build.yml > crie sonar-project.properties
-vontar em Administration / Analysis Method:
-1-Desabilitar Automatic Analysis: Tem que criar um pull request para funcionar
+2-Em Actions secrets and variables > new repository secret > copiar e colar: Name = SONAR_TOKEN e Value = > add secret
+Passo 4: Voltando ao sonar para configurar os arquivos no projeto
+1-Escolher o tipo do projeto> Js/ts > crie.github/workflows/build.yml > e crie sonar-project.properties
+Finalizado.
+
+No projeto:
+Para funcionar: Tem que criar um pull request 
+
+
+# Workflow:
+1. Crie uma branch para a tarefa
+2. Dev codifica localmente
+    - 1.1 Planejamento
+    - 1.2 Revisão do Plano 
+    - 1.3 Segunda Opinião 
+    - 1.4 Implementa o plano 
+    - 1.5 Revisão manual
+    - 1.6 Revisão com IA pré-PR (@branch)
+3. Cria o Pull Request 
+5. SonarCloud analisa o PR
+6. Dev corrige os issues do SonarCloud
+7. Code Review (revisão humana por outro dev)
+8. Quality Gate aprovado → Merge
 
 ## 🤖 Workflow Multi-Agent para Issues Complexas
 
+Na raiz do projeto delete o index.js.
+
 Configuração:
+
+git status: nothing to commit, working tree clean
 
 ```bash
 # Crie uma branch para a tarefa
 git checkout -b feature/issue001
 ```
-
 ### **Fase 1: Planejamento** (Claude Sonnet 4.5/4.6)
 
 - Criar um plano da implementação
@@ -178,20 +220,50 @@ Atualize o código com base no seu feedback, escolhendo a melhor solução para 
 
 ### **Fase 6: Pull Request**
 
-- push . Abrir um pull request
-- SonarCloud analisa o PR
-Criar o pull request para o sonar analisar
+- Crie um push da branch feature/issue001
+- No github, abra uma Pull Request : ckique em "compare & pull request"
+- Dê um titulo, descrição e clique em **Create pull request**
+- SonarCloud analisará a PR
+
+No sonarcloud:
 
 - Dev corrige os issues do SonarCloud
-- PR sai de Draft → Ready for Review
+Todo vez que o o dev acionar um push na branch, o sonar coud irá verificar
+
+Opicional: para testes:
+
+Prompt 1: solictar a configuração para analisar etstes no soanar
+
+```text
+configure o sonarcloud para Informar o Sonar onde está o coverage. Lembre de configurar workflow do GitHub Actions .github/workflows/build.yml e o arquivo sonar-project.properties
+excluir a pasta de testes do sonar
+```
+configurará o arquivo sonar-project.properties
+git add .
+git commit -m "test: add coverage report for sonar"
+git push origin feature/issue001
+Depois:
+aguarde a análise
+reabra a PR
+o coverage deve aparecer
 
 ### **Fase 7: Code Review**
 
 - Code Review (revisão humana por outro programador)
 
+
 ### **Fase 8: Quality Gate**
 
+feature/issue001 -> Passed
+
 - Quality Gate aprovado → Merge
+
+Sonar:
+- MainBranch > Quality Gate: clique em  Sonar way
+
+- Quality Gate aprovado → Merge : Clique no github em Merge pull request > Confirm merge
+
+Main Branch Summary: Passed
 
 ---
 
